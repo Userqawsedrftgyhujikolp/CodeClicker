@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コーディングクリッカー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>コードクリッカー</h1>
+    <main>
+        <hr>
+        <section class="main">
+            <div class="mainbar">
+                <div class="Mbar">
+                    <p class="Cmon">$<span class="Money"></span></p>
+                    <p>毎秒: ＄<span class="aps">0</span></p>
+                    <input type="button" value="コードを書く" class="cording">
+
+                </div>
+            </div>
+            <div class="upgradebar">
+                <div class="Ubar">
+                    <table class="BuyUpgrade">
+                    </table>
+                </div>
+            </div>
+            <div class="statusbar">
+                <div class="Sbar">
+                    <h2>現在のアップグレード</h2>
+                    <table class="status">
+                    </table>
+                </div>
+            </div>
+        </section>
+        <section class="under">
+            <hr>
+        </section>
+    </main>
+    <footer>
+        <input type="button" value="進行を保存" class="save">
+
+        <div class="debug" hidden><!--このhiddenを消すとデバッグメニューが使えます-->
+            <input type="button" value="所持金リセット" class="debug1">
+            <input type="button" value="完全リセット" class="debug2"><br>
+            <input type="button" value="所持金を1万$増やす" class="debug3">
+            <input type="button" value="所持金を1億$増やす" class="debug4">
+            <input type="button" value="所持金を1兆$増やす" class="debug5">
+            <input type="button" value="所持金を1京$増やす" class="debug6">
+            <input type="button" value="所持金を1垓$増やす" class="debug7">
+        </div>
+    </footer>
+    <!-- JS -->
+    <script src="Clicker.js"></script>
+</body>
+
+</html>

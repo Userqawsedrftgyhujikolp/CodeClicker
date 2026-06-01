@@ -1,0 +1,38 @@
+body {
+    margin: auto;
+    font-size: 15px;
+}
+.main {
+    display: flex;
+}
+.mainbar,
+.upgradebar,
+.statusbar{
+    width: 100vw;
+    margin-left: 5px ;
+    border-left: solid #000 2px;
+}
+.Mbar,.Ubar,.Sbar{
+    margin: 5px 5px;
+}
+
+/* メイン */
+.Mbar{
+    text-align: center;
+}
+.Cmon{
+    font-size: 3.5em;
+    margin: 30px auto;
+}
+.cording{
+    width: 150px;
+    height: 50px;
+}
+
+/* アップグレード */
+.hidden {
+    display: none !important;
+}
+
+/* ステータス */
+
