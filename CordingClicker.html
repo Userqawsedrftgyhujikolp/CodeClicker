@@ -43,13 +43,18 @@
         <input type="button" value="進行を保存" class="save">
 
         <div class="debug" hidden><!--このhiddenを消すとデバッグメニューが使えます-->
-            <input type="button" value="所持金リセット" class="debug1">
-            <input type="button" value="完全リセット" class="debug2"><br>
-            <input type="button" value="所持金を1万$増やす" class="debug3">
-            <input type="button" value="所持金を1億$増やす" class="debug4">
-            <input type="button" value="所持金を1兆$増やす" class="debug5">
-            <input type="button" value="所持金を1京$増やす" class="debug6">
-            <input type="button" value="所持金を1垓$増やす" class="debug7">
+            <label title="この項目を有効にすると、画面更新時にデバッグメニューが隠れなくなります"><input type="checkbox" id="debugFlg">デバッグメニューを常に有効化する</label><br>
+            <input type="button" value="所持金リセット" class="reset1">
+            <input type="button" value="クリック強化リセット" class="reset2">
+            <input type="button" value="所持施設リセット" class="reset3">
+            <input type="button" value="施設強化リセット" class="reset4">
+            <input type="button" value="完全リセット" class="resetAll"><br>
+            <input type="button" value="所持金を1万$増やす" class="debugM1">
+            <input type="button" value="所持金を1億$増やす" class="debugM2">
+            <input type="button" value="所持金を1兆$増やす" class="debugM3">
+            <input type="button" value="所持金を1京$増やす" class="debugM4">
+            <input type="button" value="所持金を1垓$増やす" class="debugM5"><br>
+            <label><input type="checkbox" class="debugAps1">Apsを0にする</label>
         </div>
     </footer>
     <!-- JS -->

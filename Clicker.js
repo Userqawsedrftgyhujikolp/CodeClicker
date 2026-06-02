@@ -1,52 +1,39 @@
 console.log('HelloWorld');
-alert('コードクリッカーへようこそ！\n\n「コードを書く」をクリックしてお金を稼ぎ\n稼いだお金で更にコーディングを加速させよう！');
+const Item_text = {//表示物兼Tier数定義
+    //name->ボタンやステータスバーに表示されるテキスト・text->ホバー時に表示されるテキスト
+    //ここに要素を追加することでT20まで増やせます（必ずT〇の名前で順番に増やすこと）
+    //それ以上を追加する場合は上のItem_configのRankとPowerに要素を追加してください
+    //名称:{name:``, text:``},
+    Click: { name: `コーディング学習`, text: `効率の良いコーディング法を学びクリックによる生産量を増やす\n『プログラミング究極ガイド(税別10,000円)』` },
+    T1: { name: `AIコーディング`, text: `コーディングをAIで自動化する\n『無課金でトークンを使い果たせ！』` },
+    T2: { name: `プログラミング教室`, text: `プログラミング教室を開催し生徒にコードを書かせます\n『実務的な学習をあなたに！』` },
+    T3: { name: `委託開発`, text: `他のプログラマにコーディングを依頼します\n『外注費：1日あたり玄米4合と味噌と少しの野菜』` },
+    T4: { name: `チーム開発`, text: `エンジニアを雇用しチームでコーディングをします\n『労基法 みんなで犯せば 怖くない』` },
+    T5: { name: `サーバ増設`, text: `サーバを購入し利用できる計算資源を増やします\n『自家製AI・玄人Code』` },
+    T6: { name: `巨大ITベンチャー設立`, text: `数千人の技術者を雇用し巨大企業を設立します\n『絶えず美しい夜景を我々の手で』` },
+    T7: { name: `量子コンピューター開発`, text: `量子の特性を活かし従来の数億倍の速さで演算をします\n『効率よくバグ取りができる、効率よくバグも発生する』` },
+    T8: { name: `惑星探査`, text: `地球外を探査し他の惑星にデータセンターを設立します\n『開発において真に驚くべき方法を見つけたが、\n　それをするにはこの星は狭すぎる』` },
+    T9: { name: `ダイソンスフィア`, text: `恒星を包む発電機を作り莫大な電力を演算に使用します\n『太陽の光が届かなくなったが、おかげで冷却効率は上がった』` },
+    T10: { name: `人工脳`, text: `無数の人工脳細胞を培養し、夢の中でコードを書かせます\n『人工知能の極致』` },
+    T11: { name: `タイムマシン`, text: `過去に戻り、見つかる前のバグを修正します\n『残業代はありません、タイムカードに記録がないですからね』` },
+    T12: { name: `数学的特異点`, text: `ゼロ除算を始めとする新たな理論を構築し、数学的限界を超越します\n『コードの効率化のため、まず1=2とします』` },
+    T13: { name: `多元宇宙`, text: `平行世界へ接続し宇宙全体をコンピュータにします\n『---マージコンフリクトを検出---\n　クソッ、他の自分がコードを書き替えやがった！』` },
+    T14: { name: `機械仕掛けの神`, text: `コードにより神を構築し世界を書き換えます\n『神は死んだ？自分で創ればいいじゃないか』` },
+    T15: { name: `JavaScript`, text: `この世界を構築するソースコードから更にコードを生み出します\n『全てはここから始まった』` },
+}
+const Itemkeys = Object.keys(Item_text);
 //ステータス
 const gameState = {
     //Tier21以降を増やした場合はここで読み込まないとエラーが起きます
     Money: parseFloat(localStorage.getItem('Money')) || 0,
     ClRank: parseInt(localStorage.getItem(`ClRank`)) || 0,
     ClPower: parseInt(localStorage.getItem('ClPow')) || 0,
-    T1Rank: parseInt(localStorage.getItem(`T1Rank`)) || 0,
-    T1Pow: parseInt(localStorage.getItem(`T1Pow`)) || 0,
-    T2Rank: parseInt(localStorage.getItem(`T2Rank`)) || 0,
-    T2Pow: parseInt(localStorage.getItem(`T2Pow`)) || 0,
-    T3Rank: parseInt(localStorage.getItem(`T3Rank`)) || 0,
-    T3Pow: parseInt(localStorage.getItem(`T3Pow`)) || 0,
-    T4Rank: parseInt(localStorage.getItem(`T4Rank`)) || 0,
-    T4Pow: parseInt(localStorage.getItem(`T4Pow`)) || 0,
-    T5Rank: parseInt(localStorage.getItem(`T5Rank`)) || 0,
-    T5Pow: parseInt(localStorage.getItem(`T5Pow`)) || 0,
-    T6Rank: parseInt(localStorage.getItem(`T6Rank`)) || 0,
-    T6Pow: parseInt(localStorage.getItem(`T6Pow`)) || 0,
-    T7Rank: parseInt(localStorage.getItem(`T7Rank`)) || 0,
-    T7Pow: parseInt(localStorage.getItem(`T7Pow`)) || 0,
-    T8Rank: parseInt(localStorage.getItem(`T8Rank`)) || 0,
-    T8Pow: parseInt(localStorage.getItem(`T8Pow`)) || 0,
-    T9Rank: parseInt(localStorage.getItem(`T9Rank`)) || 0,
-    T9Pow: parseInt(localStorage.getItem(`T9Pow`)) || 0,
-    T10Rank: parseInt(localStorage.getItem(`T10Rank`)) || 0,
-    T10Pow: parseInt(localStorage.getItem(`T10Pow`)) || 0,
-    T11Rank: parseInt(localStorage.getItem(`T11Rank`)) || 0,
-    T11Pow: parseInt(localStorage.getItem(`T11Pow`)) || 0,
-    T12Rank: parseInt(localStorage.getItem(`T12Rank`)) || 0,
-    T12Pow: parseInt(localStorage.getItem(`T12Pow`)) || 0,
-    T13Rank: parseInt(localStorage.getItem(`T13Rank`)) || 0,
-    T13Pow: parseInt(localStorage.getItem(`T13Pow`)) || 0,
-    T14Rank: parseInt(localStorage.getItem(`T14Rank`)) || 0,
-    T14Pow: parseInt(localStorage.getItem(`T14Pow`)) || 0,
-    T15Rank: parseInt(localStorage.getItem(`T15Rank`)) || 0,
-    T15Pow: parseInt(localStorage.getItem(`T15Pow`)) || 0,
-    T16Rank: parseInt(localStorage.getItem(`T16Rank`)) || 0,
-    T16Pow: parseInt(localStorage.getItem(`T16Pow`)) || 0,
-    T17Rank: parseInt(localStorage.getItem(`T17Rank`)) || 0,
-    T17Pow: parseInt(localStorage.getItem(`T17Pow`)) || 0,
-    T18Rank: parseInt(localStorage.getItem(`T18Rank`)) || 0,
-    T18Pow: parseInt(localStorage.getItem(`T18Pow`)) || 0,
-    T19Rank: parseInt(localStorage.getItem(`T19Rank`)) || 0,
-    T19Pow: parseInt(localStorage.getItem(`T19Pow`)) || 0,
-    T20Rank: parseInt(localStorage.getItem(`T20Rank`)) || 0,
-    T20Pow: parseInt(localStorage.getItem(`T20Pow`)) || 0,
 };
+for (let i = 1; i <= (Itemkeys.length - 1); i++) {
+    gameState[`T${i}Rank`] = parseInt(localStorage.getItem(`T${i}Rank`)) || 0;
+    gameState[`T${i}Pow`] = parseInt(localStorage.getItem(`T${i}Pow`)) || 0;
+}
+let isDev = parseInt(localStorage.getItem("debugFlg")) || 0;
 let lastTime = performance.now();
 let Aps = parseFloat(0);
 let nextTier = parseInt(localStorage.getItem(`nextTier`)) || 1;
@@ -99,29 +86,7 @@ const Item_config = {//強化項目の数値
     T19Pow: { BaceCost: 123700947647153132441900, multipul: 2.9 },
     T20Pow: { BaceCost: 1608112319412990721744700, multipul: 2.9 },
 }
-const Item_text = {//表示物
-    //name->ボタンやステータスバーに表示されるテキスト・text->ホバー時に表示されるテキスト
-    //ここに要素を追加することでT20まで増やせます（必ずT〇の名前で順番に増やすこと）
-    //それ以上を追加する場合は上のItem_configのRankとPowerに要素を追加してください
-    //名称:{name:``, text:``},
-    Click: { name: `コーディング学習`, text: `効率の良いコーディング法を学びクリックによる生産量を増やす\n『プログラミング究極ガイド(税別10,000円)』` },
-    T1: { name: `AIコーディング`, text: `コーディングをAIで自動化する\n『無課金でトークンを使い果たせ！』` },
-    T2: { name: `プログラミング教室`, text: `プログラミング教室を開催し生徒にコードを書かせます\n『実務的な学習をあなたに！』` },
-    T3: { name: `委託開発`, text: `他のプログラマにコーディングを依頼します\n『外注費：1日あたり玄米4合と味噌と少しの野菜』` },
-    T4: { name: `チーム開発`, text: `エンジニアを雇用しチームでコーディングをします\n『労基法 みんなで犯せば 怖くない』` },
-    T5: { name: `サーバ増設`, text: `サーバを購入し利用できる計算資源を増やします\n『自家製AI・玄人Code』` },
-    T6: { name: `巨大ITベンチャー設立`, text: `数千人の技術者を雇用し巨大企業を設立します\n『絶えず美しい夜景を我々の手で』` },
-    T7: { name: `量子コンピューター開発`, text: `量子の特性を活かし従来の数億倍の速さで演算をします\n『効率よくバグ取りができる、効率よくバグも発生する』` },
-    T8: { name: `惑星探査`, text: `地球外を探査し他の惑星にデータセンターを設立します\n『開発において真に驚くべき方法を見つけたが、\n　それをするにはこの星は狭すぎる』` },
-    T9: { name: `ダイソンスフィア`, text: `恒星を包む発電機を作り莫大な電力を演算に使用します\n『太陽の光が届かなくなったが、おかげで冷却効率は上がった』` },
-    T10: { name: `人工脳`, text: `無数の人工脳細胞を培養し、夢の中でコードを書かせます\n『人工知能の極致』` },
-    T11: { name: `タイムマシン`, text: `過去に戻り、見つかる前のバグを修正します\n『残業代はありません、タイムカードに記録がないですからね』` },
-    T12: { name: `数学的特異点`, text: `ゼロ除算を始めとする新たな理論を構築し、数学的限界を超越します\n『コードの効率化のため、まず1=2とします』` },
-    T13: { name: `多元宇宙`, text: `平行世界へ接続し宇宙全体をコンピュータにします\n『---マージコンフリクトを検出---\n　クソッ、他の自分がコードを書き替えやがった！』` },
-    T14: { name: `機械仕掛けの神`, text: `コードにより神を構築し世界を書き換えます\n『神は死んだ？自分で創ればいいじゃないか』` },
-    T15: { name: `JavaScript`, text: `この世界を構築するソースコードから更にコードを生み出します\n『全てはここから始まった』` },
-}
-const Itemkeys = Object.keys(Item_text);
+
 //数値更新時処理等
 const game = new Proxy(gameState, {
     set(target, prop, value) {
@@ -144,20 +109,14 @@ const game = new Proxy(gameState, {
             let Cost = CalCost('ClRank', value);
             document.querySelector('.UpgradeClk').value = `${Item_text['Click']['name']} (＄: ${formatNum(Cost)})`;
         }
-        if (prop === 'T1Rank' || prop === 'T2Rank' || prop === 'T3Rank' || prop === 'T4Rank' || prop === 'T5Rank' ||
-            prop === 'T6Rank' || prop === 'T7Rank' || prop === 'T8Rank' || prop === 'T9Rank' || prop === 'T10Rank' ||
-            prop === 'T11Rank' || prop === 'T12Rank' || prop === 'T13Rank' || prop === 'T14Rank' || prop === 'T15Rank'
-        ) {
+        if (/^T\d+Rank$/.test(prop)) {
             const tier = prop.replace('Rank', "");
             document.querySelector(`.${tier}`).textContent = `${Item_text[tier]['name']}: ${Math.floor(value)}`;
             let Cost = CalCost(prop, value);
             document.querySelector(`.Auto${tier}`).value = `${Item_text[tier]['name']} (＄: ${formatNum(Cost)})`;
             Aps = CalAps();
         }
-        if (prop === 'T1Pow' || prop === 'T2Pow' || prop === 'T3Pow' || prop === 'T4Pow' || prop === 'T5Pow' ||
-            prop === 'T6Pow' || prop === 'T7Pow' || prop === 'T8Pow' || prop === 'T9Pow' || prop === 'T10Pow' ||
-            prop === 'T11Pow' || prop === 'T12Pow' || prop === 'T13Pow' || prop === 'T14Pow' || prop === 'T15Pow'
-        ) {
+        if (/^T\d+Pow$/.test(prop)) {
             const tier = prop.replace('Pow', "");
             const disTier = prop.replace('ow', "");
             document.querySelector(`.${disTier}`).textContent = `${tier}強化: ${Math.floor(value + 1)}`;
@@ -187,9 +146,13 @@ function gameLoop(currentTime) {//自動化
     requestAnimationFrame(gameLoop);
 }
 function CalAps() {//Aps計算
+
     let num = 0;
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         num += Item_config[`T${i}Rank`].Pow * (game[`T${i}Rank`] * Math.pow(2, game[`T${i}Pow`]));
+    }
+    if(1 == zeroApsFlg){
+        num = 0;
     }
     document.querySelector('.aps').textContent = formatNum(num);
     return num;
@@ -209,6 +172,7 @@ function formatNum(num) {//数値の整形
     }
     //桁数と表示する文字を定義
     const units = [
+        { value: 1e24, symbol: '𥝱' },
         { value: 1e20, symbol: '垓' },
         { value: 1e16, symbol: '京' },
         { value: 1e12, symbol: '兆' },
@@ -263,28 +227,70 @@ setInterval(() => {//オートセーブ
 }, 300000);
 
 //デバッグメニュー
+function debugFlg() {
+    let Flg = document.querySelector('#debugFlg');
+    if (Flg.checked) {
+        localStorage.setItem(`debugFlg`, 1);
+        saveGame();
+        console.log(`デバッグメニューを常に有効にします`);
+    } else {
+        localStorage.setItem(`debugFlg`, 0);
+        saveGame();
+        console.log(`次回起動時デバッグメニューを非表示にします`);
+    }
+}
 function Mreset() {//リセット処理
     game.Money = 0;
     console.log(`所持金を初期化しました/Money has been reset.`);
 }
-function Areset() {//完全リセット処理
-    localStorage.clear();
-    game.Money = 0;
+function Creset() {//クリックリセット
     game.ClRank = 0;
-    game.ClPower = 0;
+    console.log(`クリックを初期化しました/TierUpgrade has been reset.`);
+}
+function Areset() {//完全リセット処理
+    if (confirm("本当にリセットしますか？\n*セーブデータも削除され元に戻すことができません*")) {
+        localStorage.clear();
+        game.Money = 0;
+        game.ClRank = 0;
+        game.ClPower = 0;
+        for (let i = 1; i <= (Itemkeys.length - 1); i++) {
+            game[`T${i}Rank`] = 0;
+            game[`T${i}Pow`] = 0;
+        }
+        Aps = CalAps();
+        nextTier = 1;
+        saveGame();
+        console.log(`進行を初期化しました/GameData has been reset.`);
+        location.reload();
+    }
+}
+function Treset() {//施設数リセット
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         game[`T${i}Rank`] = 0;
+    }
+    console.log(`施設数を初期化しました/TierUpgrade has been reset.`);
+}
+function Preset() {//施設強化リセット
+    for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         game[`T${i}Pow`] = 0;
     }
-    Aps = CalAps();
-    nextTier = 1;
-    saveGame();
-    console.log(`進行を初期化しました/GameData has been reset.`);
-    location.reload();
+    console.log(`施設強化を初期化しました/TierPow has been reset.`);
 }
 function addMoney(i) {//所持金増額
-    game.Money += 1*Math.pow(10,i);
+    game.Money += 1 * Math.pow(10, i);
     console.log(`所持金を増やしました/.`);
+}
+let zeroApsFlg = 0;
+function ZeroAps(){//Apsを0にする
+        if (document.querySelector('.debugAps1').checked) {
+        zeroApsFlg = 1;
+        Aps = CalAps();
+        console.log(`Apsを0にします`);
+    } else {
+        zeroApsFlg = 0;
+        Aps = CalAps();
+        console.log(`通常のApsにします`);
+    }
 }
 
 // 起動時処理
@@ -292,16 +298,16 @@ function addMoney(i) {//所持金増額
 //購入ボタン
 const buyTable = document.querySelector('.BuyUpgrade');
 let buyButton = `
-    <tr>
-        <td><input type="button" class="UpgradeClk" value="Click" title="Clicktext"></td>
-        <td></td>
-    </tr>
+<tr>
+<td><input type="button" class="UpgradeClk" value="Click" title="Clicktext"></td>
+<td></td>
+</tr>
 `;
 for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     buyButton += `
     <tr>
-        <td><input type="button" class="AutoT${i} hidden" value="Tier${i}"></td>
-        <td><input type="button" class="T${i}Pow hidden" value="T${i}強化"></td>
+    <td><input type="button" class="AutoT${i} hidden" value="Tier${i}"></td>
+    <td><input type="button" class="T${i}Pow hidden" value="T${i}強化"></td>
     </tr>
     `;
 }
@@ -309,16 +315,16 @@ buyTable.innerHTML = buyButton;
 //ステータスバー
 const statusTable = document.querySelector('.status');
 let statusdis = `
-    <tr>
-        <td><span class="ClPow">Click</span></td>
-        <td><span class="ClP"></span></td>
-    </tr>
+<tr>
+<td><span class="ClPow">Click</span></td>
+<td><span class="ClP"></span></td>
+</tr>
 `;
 for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     statusdis += `
     <tr>
-        <td><span class="T${i} hidden">tier${i}</span></td>
-        <td><span class="T${i}P hidden">tier${i}Pow</span></td>
+    <td><span class="T${i} hidden">tier${i}</span></td>
+    <td><span class="T${i}P hidden">tier${i}Pow</span></td>
     </tr>
     `;
 }
@@ -334,8 +340,13 @@ for (let i = 1; i <= (Itemkeys.length - 1); i++) {
 }
 Aps = CalAps();
 //起動時の非表示解除
-for(let i = 1; i < nextTier; i++){
+for (let i = 1; i < nextTier; i++) {
     unlockTierDOM(i);
+}
+if (1 == isDev) {
+    document.querySelector('.debug').removeAttribute('hidden');
+    const debFlgBox = document.querySelector('#debugFlg');
+    debFlgBox.checked = true;
 }
 //イベント定義
 requestAnimationFrame(gameLoop);
@@ -349,10 +360,18 @@ for (let i = 1; i <= (Itemkeys.length - 1); i++) {
 }
 //その他
 document.querySelector('.save').addEventListener(`click`, saveGame);
-document.querySelector('.debug1').addEventListener(`click`, Mreset);
-document.querySelector('.debug2').addEventListener(`click`, Areset);
-document.querySelector('.debug3').addEventListener(`click`, () => addMoney(4));
-document.querySelector('.debug4').addEventListener(`click`, () => addMoney(8));
-document.querySelector('.debug5').addEventListener(`click`, () => addMoney(12));
-document.querySelector('.debug6').addEventListener(`click`, () => addMoney(16));
-document.querySelector('.debug7').addEventListener(`click`, () => addMoney(20));
+document.querySelector('#debugFlg').addEventListener(`change`, debugFlg);
+document.querySelector('.reset1').addEventListener(`click`, Mreset);
+document.querySelector('.reset2').addEventListener(`click`, Creset);
+document.querySelector('.reset3').addEventListener(`click`, Treset);
+document.querySelector('.reset4').addEventListener(`click`, Preset);
+document.querySelector('.resetAll').addEventListener(`click`, Areset);
+document.querySelector('.debugM1').addEventListener(`click`, () => addMoney(4));
+document.querySelector('.debugM2').addEventListener(`click`, () => addMoney(8));
+document.querySelector('.debugM3').addEventListener(`click`, () => addMoney(12));
+document.querySelector('.debugM4').addEventListener(`click`, () => addMoney(16));
+document.querySelector('.debugM5').addEventListener(`click`, () => addMoney(20));
+document.querySelector('.debugAps1').addEventListener(`change`, ZeroAps);
+if(0 == isDev) {
+    alert('コードクリッカーへようこそ！\n\n「コードを書く」をクリックしてお金を稼ぎ\n稼いだお金で更にコーディングを加速させよう！');
+}
