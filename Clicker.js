@@ -4,17 +4,17 @@ const Item_text = {//表示物兼Tier数定義
     //ここに要素を追加することでT20まで増やせます（必ずT〇の名前で順番に増やすこと）
     //それ以上を追加する場合は上のItem_configのRankとPowerに要素を追加してください
     //名称:{name:``, text:``},
-    Click: { name: `コーディング学習`, text: `効率の良いコーディング法を学びクリックによる生産量を増やす\n『プログラミング究極ガイド(税別10,000円)』` },
+    Click: { name: `コーディング学習`, text: `効率の良いコーディング法を学びクリックによる生産量を増やす\n『プログラミング究極ガイド(税別30,000円)』` },
     T1: { name: `AIコーディング`, text: `コーディングをAIで自動化する\n『無課金でトークンを使い果たせ！』` },
-    T2: { name: `プログラミング教室`, text: `プログラミング教室を開催し生徒にコードを書かせます\n『実務的な学習をあなたに！』` },
+    T2: { name: `プログラミング教室`, text: `プログラミング教室を開催し生徒にコードを書かせます\n『実務的な学習をあなたに！\n　*学習時のコードの権利は本校に帰属します*』` },
     T3: { name: `委託開発`, text: `他のプログラマにコーディングを依頼します\n『外注費：1日あたり玄米4合と味噌と少しの野菜』` },
     T4: { name: `チーム開発`, text: `エンジニアを雇用しチームでコーディングをします\n『労基法 みんなで犯せば 怖くない』` },
-    T5: { name: `サーバ増設`, text: `サーバを購入し利用できる計算資源を増やします\n『自家製AI・玄人Code』` },
+    T5: { name: `サーバ増設`, text: `サーバを購入し利用できる計算資源を増やします\n『自家製AI・玄人(くろうど)Code』` },
     T6: { name: `巨大ITベンチャー設立`, text: `数千人の技術者を雇用し巨大企業を設立します\n『絶えず美しい夜景を我々の手で』` },
     T7: { name: `量子コンピューター開発`, text: `量子の特性を活かし従来の数億倍の速さで演算をします\n『効率よくバグ取りができる、効率よくバグも発生する』` },
     T8: { name: `惑星探査`, text: `地球外を探査し他の惑星にデータセンターを設立します\n『開発において真に驚くべき方法を見つけたが、\n　それをするにはこの星は狭すぎる』` },
     T9: { name: `ダイソンスフィア`, text: `恒星を包む発電機を作り莫大な電力を演算に使用します\n『太陽の光が届かなくなったが、おかげで冷却効率は上がった』` },
-    T10: { name: `人工脳`, text: `無数の人工脳細胞を培養し、夢の中でコードを書かせます\n『人工知能の極致』` },
+    T10: { name: `人工脳`, text: `無数の人工脳細胞を培養し、夢の中でコードを書かせます\n『人工脳がコードの夢を見るのか、コードが人工脳の夢を見るのか\n　**就寝時間は労働時間に見なされません**』` },
     T11: { name: `タイムマシン`, text: `過去に戻り、見つかる前のバグを修正します\n『残業代はありません、タイムカードに記録がないですからね』` },
     T12: { name: `数学的特異点`, text: `ゼロ除算を始めとする新たな理論を構築し、数学的限界を超越します\n『コードの効率化のため、まず1=2とします』` },
     T13: { name: `多元宇宙`, text: `平行世界へ接続し宇宙全体をコンピュータにします\n『---マージコンフリクトを検出---\n　クソッ、他の自分がコードを書き替えやがった！』` },
@@ -24,10 +24,9 @@ const Item_text = {//表示物兼Tier数定義
 const Itemkeys = Object.keys(Item_text);
 //ステータス
 const gameState = {
-    //Tier21以降を増やした場合はここで読み込まないとエラーが起きます
     Money: parseFloat(localStorage.getItem('Money')) || 0,
     ClRank: parseInt(localStorage.getItem(`ClRank`)) || 0,
-    ClPower: parseInt(localStorage.getItem('ClPow')) || 0,
+    ClPow: parseInt(localStorage.getItem('ClPow')) || 0,
 };
 for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     gameState[`T${i}Rank`] = parseInt(localStorage.getItem(`T${i}Rank`)) || 0;
@@ -212,7 +211,7 @@ function BuyUpgrade(rank) {//自動化購入
 function saveGame() {//保存処理
     localStorage.setItem('Money', game.Money);
     localStorage.setItem('ClRank', game.ClRank);
-    localStorage.setItem('ClPow', game.ClPower);
+    localStorage.setItem('ClPow', game.ClPow);
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         localStorage.setItem(`T${i}Rank`, game[`T${i}Rank`]);
         localStorage.setItem(`T${i}Pow`, game[`T${i}Pow`]);
@@ -252,7 +251,7 @@ function Areset() {//完全リセット処理
         localStorage.clear();
         game.Money = 0;
         game.ClRank = 0;
-        game.ClPower = 0;
+        game.ClPow = 0;
         for (let i = 1; i <= (Itemkeys.length - 1); i++) {
             game[`T${i}Rank`] = 0;
             game[`T${i}Pow`] = 0;
