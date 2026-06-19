@@ -24,69 +24,69 @@ const Item_text = {//表示物兼Tier数定義
 const Itemkeys = Object.keys(Item_text);
 //ステータス
 const gameState = {
-    Money: parseFloat(localStorage.getItem('Money')) || 0,
-    ClRank: parseInt(localStorage.getItem(`ClRank`)) || 0,
-    ClPow: parseInt(localStorage.getItem('ClPow')) || 0,
+    Money: BigInt(Math.floor(parseFloat(localStorage.getItem('Money'))) || 0n),
+    ClRank: parseInt(localStorage.getItem(`ClRank`) || 0),
+    ClPow: parseInt(localStorage.getItem('ClPow') || 0),
 };
 for (let i = 1; i <= (Itemkeys.length - 1); i++) {
-    gameState[`T${i}Rank`] = parseInt(localStorage.getItem(`T${i}Rank`)) || 0;
-    gameState[`T${i}Pow`] = parseInt(localStorage.getItem(`T${i}Pow`)) || 0;
+    gameState[`T${i}Rank`] = parseInt(localStorage.getItem(`T${i}Rank`) || 0);
+    gameState[`T${i}Pow`] = parseInt(localStorage.getItem(`T${i}Pow`) || 0);
 }
 //その他データ準備
-let isDev = parseInt(localStorage.getItem("debugFlg")) || 0;
+let isDev = parseInt(localStorage.getItem("debugFlg") || 0);
 let lastTime = performance.now();
-let Aps = parseFloat(0);
-let nextTier = parseInt(localStorage.getItem(`nextTier`)) || 1;
+let Aps = 0n;
+let nextTier = parseInt(localStorage.getItem(`nextTier`) || 1);
 
 const Item_config = {//強化項目の数値
     //T20以上を追加する場合はRankとPowの両方を追加してください
     //注意：数字が大きすぎるためT16以降の挙動は不具合が発生する場合があります
     //BaceCost->基本価格・multipul->価格の上昇倍率・Pow->1購入あたりの秒間生産量
-    ClRank: { BaceCost: 20, multipul: 3.4, },
+    ClRank: { BaceCost: 70000n, multipul: 26n, },
     //前のTierの13倍の価格・15倍のパワー
-    T1Rank: { BaceCost: 200, multipul: 1.3, Pow: 1 },
-    T2Rank: { BaceCost: 2600, multipul: 1.3, Pow: 15 },
-    T3Rank: { BaceCost: 33800, multipul: 1.3, Pow: 225 },
-    T4Rank: { BaceCost: 439400, multipul: 1.3, Pow: 3375 },
-    T5Rank: { BaceCost: 5712200, multipul: 1.3, Pow: 50625 },
-    T6Rank: { BaceCost: 74258600, multipul: 1.3, Pow: 759375 },
-    T7Rank: { BaceCost: 965361800, multipul: 1.3, Pow: 11390625 },
-    T8Rank: { BaceCost: 12549703400, multipul: 1.3, Pow: 170859375 },
-    T9Rank: { BaceCost: 163146144200, multipul: 1.3, Pow: 2562890625 },
-    T10Rank: { BaceCost: 2120899874600, multipul: 1.3, Pow: 38443359375 },
-    T11Rank: { BaceCost: 27571698369800, multipul: 1.3, Pow: 576650390625 },
-    T12Rank: { BaceCost: 358432078807400, multipul: 1.3, Pow: 8649755859375 },
-    T13Rank: { BaceCost: 4659617024496200, multipul: 1.3, Pow: 129746337890625 },
-    T14Rank: { BaceCost: 60575021318450600, multipul: 1.3, Pow: 1946195068359375 },
-    T15Rank: { BaceCost: 787475277139857800, multipul: 1.3, Pow: 29192926025390625 },
+    T1Rank: { BaceCost: 2000000n, multipul: 13n, Pow: 1n },
+    T2Rank: { BaceCost: 26000000n, multipul: 13n, Pow: 15n },
+    T3Rank: { BaceCost: 338000000n, multipul: 13n, Pow: 225n },
+    T4Rank: { BaceCost: 4394000000n, multipul: 13n, Pow: 3375n },
+    T5Rank: { BaceCost: 57122000000n, multipul: 13n, Pow: 50625n },
+    T6Rank: { BaceCost: 742586000000n, multipul: 13n, Pow: 759375n },
+    T7Rank: { BaceCost: 9653618000000n, multipul: 13n, Pow: 11390625n },
+    T8Rank: { BaceCost: 125497034000000n, multipul: 13n, Pow: 170859375n },
+    T9Rank: { BaceCost: 1631461442000000n, multipul: 13n, Pow: 2562890625n },
+    T10Rank: { BaceCost: 21208998746000000n, multipul: 13n, Pow: 38443359375n },
+    T11Rank: { BaceCost: 275716983698000000n, multipul: 13n, Pow: 576650390625n },
+    T12Rank: { BaceCost: 3584320788074000000n, multipul: 13n, Pow: 8649755859375n },
+    T13Rank: { BaceCost: 46596170244962000000n, multipul: 13n, Pow: 129746337890625n },
+    T14Rank: { BaceCost: 605750213184506000000n, multipul: 13n, Pow: 1946195068359375n },
+    T15Rank: { BaceCost: 7874752771398578000000n, multipul: 13n, Pow: 29192926025390625n },
     //ここから未使用です
-    T16Rank: { BaceCost: 10237178602818151400, multipul: 1.3, Pow: 437893890380859375 },
-    T17Rank: { BaceCost: 133083321836635968200, multipul: 1.3, Pow: 6568408355712890625 },
-    T18Rank: { BaceCost: 1730083183876267586600, multipul: 1.3, Pow: 98526125335693359375 },
-    T19Rank: { BaceCost: 22491081390391478625800, multipul: 1.3, Pow: 1477891880035400390625 },
-    T20Rank: { BaceCost: 292384058075089222135400, multipul: 1.3, Pow: 22168378200531005859375 },
+    T16Rank: { BaceCost: 102371786028181514000000n, multipul: 13n, Pow: 437893890380859375n },
+    T17Rank: { BaceCost: 1330833218366359682000000n, multipul: 13n, Pow: 6568408355712890625n },
+    T18Rank: { BaceCost: 17300831838762675866000000n, multipul: 13n, Pow: 98526125335693359375n },
+    T19Rank: { BaceCost: 224910813903914786258000000n, multipul: 13n, Pow: 1477891880035400390625n },
+    T20Rank: { BaceCost: 2923840580750892221354000000n, multipul: 13n, Pow: 22168378200531005859375n },
     //基本価格（各TierのRankのBaceCost）の5.5倍
-    T1Pow: { BaceCost: 1100, multipul: 2.9 },
-    T2Pow: { BaceCost: 14300, multipul: 2.9 },
-    T3Pow: { BaceCost: 185900, multipul: 2.9 },
-    T4Pow: { BaceCost: 2416700, multipul: 2.9 },
-    T5Pow: { BaceCost: 31417100, multipul: 2.9 },
-    T6Pow: { BaceCost: 408422300, multipul: 2.9 },
-    T7Pow: { BaceCost: 5309489900, multipul: 2.9 },
-    T8Pow: { BaceCost: 69023368700, multipul: 2.9 },
-    T9Pow: { BaceCost: 897303793100, multipul: 2.9 },
-    T10Pow: { BaceCost: 11664949310300, multipul: 2.9 },
-    T11Pow: { BaceCost: 151644341033900, multipul: 2.9 },
-    T12Pow: { BaceCost: 1971376433440700, multipul: 2.9 },
-    T13Pow: { BaceCost: 25627893634729100, multipul: 2.9 },
-    T14Pow: { BaceCost: 333162617251478300, multipul: 2.9 },
-    T15Pow: { BaceCost: 4331114024269217900, multipul: 2.9 },
+    T1Pow: { BaceCost: 11000000n, multipul: 29n },
+    T2Pow: { BaceCost: 143000000n, multipul: 29n },
+    T3Pow: { BaceCost: 1859000000n, multipul: 29n },
+    T4Pow: { BaceCost: 24167000000n, multipul: 29n },
+    T5Pow: { BaceCost: 314171000000n, multipul: 29n },
+    T6Pow: { BaceCost: 4084223000000n, multipul: 29n },
+    T7Pow: { BaceCost: 53094899000000n, multipul: 29n },
+    T8Pow: { BaceCost: 690233687000000n, multipul: 29n },
+    T9Pow: { BaceCost: 8973037931000000n, multipul: 29n },
+    T10Pow: { BaceCost: 116649493103000000n, multipul: 29n },
+    T11Pow: { BaceCost: 1516443410339000000n, multipul: 29n},
+    T12Pow: { BaceCost: 19713764334407000000n, multipul: 29n },
+    T13Pow: { BaceCost: 256278936347291000000n, multipul: 29n },
+    T14Pow: { BaceCost: 3331626172514783000000n, multipul: 29n },
+    T15Pow: { BaceCost: 43311140242692179000000n, multipul: 29n },
     //ここからは未使用です
-    T16Pow: { BaceCost: 56304482315499832700, multipul: 2.9 },
-    T17Pow: { BaceCost: 731958270101497825100, multipul: 2.9 },
-    T18Pow: { BaceCost: 9515457511319471726300, multipul: 2.9 },
-    T19Pow: { BaceCost: 123700947647153132441900, multipul: 2.9 },
-    T20Pow: { BaceCost: 1608112319412990721744700, multipul: 2.9 },
+    T16Pow: { BaceCost: 563044823154998327000000n, multipul: 29n },
+    T17Pow: { BaceCost: 7319582701014978251000000n, multipul: 29n },
+    T18Pow: { BaceCost: 95154575113194717263000000n, multipul: 29n },
+    T19Pow: { BaceCost: 1237009476471531324419000000n, multipul: 29n },
+    T20Pow: { BaceCost: 16081123194129907217447000000n, multipul: 29n },
 }
 
 //数値更新時処理等
@@ -98,7 +98,7 @@ const game = new Proxy(gameState, {
             while (Item_config[`T${nextTier}Rank`]) {//所持金に応じたTierの解放
                 const targetConfig = Item_config[`T${nextTier}Rank`];
                 // そのTierの基本価格の30%のお金が溜まったら強化の表示解放
-                if (value >= (targetConfig.BaceCost * 0.3)) {
+                if (value >= ((targetConfig.BaceCost * 3n) / 10n)) {
                     unlockTierDOM(nextTier);
                     nextTier++;
                 } else {
@@ -132,64 +132,72 @@ const game = new Proxy(gameState, {
 
 //処理
 function cordingClk() {//クリック時処理
-    game.Money += 1 * (Math.pow(2, game.ClRank));
+    game.Money += 1000n * (2n ** BigInt(game.ClRank));
 }
 function gameLoop(currentTime) {//自動化
-    //前回のフレームから何秒経過したかを計算（ミリ秒を秒に直すため / 1000）
-    const deltaTime = (currentTime - lastTime) / 1000;
+    //前回のフレームから何秒経過したかを計算
+    const deltaTime = Math.floor(currentTime - lastTime);
     lastTime = currentTime;
-
     //自動増加（Aps）がある場合、経過時間分だけお金を増やす
     if (Aps > 0) {
-        //例:1秒に10増える(Aps=10)状態で、0.016秒(1フレーム)経過したら、0.16増える
-        game.Money += Aps * deltaTime;
+        game.Money += Aps * BigInt(deltaTime);
     }
     //ブラウザの次の描画タイミングで、再びこのgameLoopを実行する（無限ループ）
     requestAnimationFrame(gameLoop);
 }
 function calAps() {//Aps計算
-
-    let num = 0;
+    let num = 0n;
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
-        num += Item_config[`T${i}Rank`].Pow * (game[`T${i}Rank`] * Math.pow(2, game[`T${i}Pow`]));
+        num += Item_config[`T${i}Rank`].Pow * BigInt(game[`T${i}Rank`]) * (2n ** BigInt(game[`T${i}Pow`]));
     }
     if (zeroApsFlg) {
-        num = 0;
+        num = 0n;
     }
-    document.querySelector('.aps').textContent = formatNum(num);
+    document.querySelector('.aps').textContent = formatNum(num*1000n);
+    if(isDev){
+        console.log('Aps: ',num)
+    }
     return num;
 }
 function calCost(Key, Rank) {//強化コスト計算
     const item = Item_config[Key];
-    if (!item) { return false };
-    let Cost = item.BaceCost * Math.pow(item.multipul, Rank);
-    Cost *= Math.pow(1.2, Math.floor(Rank / 5));
+    const Brank = BigInt(Rank);
+    if (!item) { return -1n };
+    let Cost = (item.BaceCost * (item.multipul ** Brank));
+    Cost *= 11n ** (Brank / 5n);
+    const div = 10n * (10n ** Brank) * (10n ** (Brank/5n));
+    Cost /= div;
     if (isDev) {
-        console.log('コスト: ', Key, ' = ', Cost);
+        console.log('コスト: ', Key, ' = ', Cost,':(',formatNum(Cost),')');
     }
     return Cost;
 }//calCost('T1Rank',game.T1Rank);
 function formatNum(num) {//数値の整形
     // 1万未満の場合はそのまま返す
-    if (num < 10000) {
-        return Math.floor(num).toString();
+    num = num / 1000n;
+    if (num < 10000n) {
+        return num.toString();
     }
     //桁数と表示する文字を定義
     const units = [
-        { value: 1e24, symbol: '𥝱' },
-        { value: 1e20, symbol: '垓' },
-        { value: 1e16, symbol: '京' },
-        { value: 1e12, symbol: '兆' },
-        { value: 1e8, symbol: '億' },
-        { value: 1e4, symbol: '万' },
+        { value: 10n ** 32n, symbol: '溝' },
+        { value: 10n ** 28n, symbol: '穣' },
+        { value: 10n ** 24n, symbol: '𥝱' },
+        { value: 10n ** 20n, symbol: '垓' },
+        { value: 10n ** 16n, symbol: '京' },
+        { value: 10n ** 12n, symbol: '兆' },
+        { value: 10n ** 8n, symbol: '億' },
+        { value: 10n ** 4n, symbol: '万' },
     ];
     //上記オブジェクトの上から順に数値を比較し適切な桁を調べる
     for (let i = 0; i < units.length; i++) {
         if (num >= units[i].value) {
-            return (num / units[i].value).toFixed(2) + units[i].symbol;
+            let numstr = (num / (units[i].value / 100n))+``;
+            return numstr.slice(0, -2)+'.'+numstr.slice(-2)+ units[i].symbol;
+            
         }
     }
-    return Math.floor(num).toString();
+    return num.toString();
 }
 function unlockTierDOM(tier) {//非表示の解除
     const autoBtn = document.querySelector(`.AutoT${tier}`);
@@ -208,6 +216,7 @@ function unlockTierDOM(tier) {//非表示の解除
 //強化系
 function buyUpgrade(rank) {//自動化購入
     let Cost = calCost(rank, game[rank]);
+    if (Cost <= 0n) {return false;}
     if (game.Money >= Cost) {
         game.Money -= Cost;
         game[rank]++;
@@ -256,7 +265,7 @@ function debugFlg() {
 }
 function mReset() {//リセット処理
     if (isDev) {
-        game.Money = 0;
+        game.Money = 0n;
         console.log(`所持金を初期化しました/Money has been reset.`);
     }
 }
@@ -270,7 +279,7 @@ function aReset() {//完全リセット処理
     if (isDev) {
         if (confirm("本当にリセットしますか？\n*セーブデータも削除され元に戻すことができません*")) {
             localStorage.clear();
-            game.Money = 0;
+            game.Money = 0n;
             game.ClRank = 0;
             game.ClPow = 0;
             for (let i = 1; i <= (Itemkeys.length - 1); i++) {
@@ -303,8 +312,9 @@ function pReset() {//施設強化リセット
 }
 function addMoney(i) {//所持金増額
     if (isDev) {
-        game.Money += 1 * Math.pow(10, i);
-        console.log(`所持金を$${1 * Math.pow(10, i)}増やしました/.`);
+        const add = 1000n * (10n ** BigInt(i));
+        game.Money += add;
+        console.log(`所持金を${add}(${formatNum(add)})増やしました/.`);
     }
 }
 let zeroApsFlg = 0;
