@@ -24,7 +24,7 @@ const Item_text = {//表示物兼Tier数定義
 const Itemkeys = Object.keys(Item_text);
 //ステータス
 const gameState = {
-    Money: BigInt(Math.floor(parseFloat(localStorage.getItem('Money'))) || 0n),
+    Money: BigInt(localStorage.getItem('Money') || 0n),
     ClRank: parseInt(localStorage.getItem(`ClRank`) || 0),
     ClPow: parseInt(localStorage.getItem('ClPow') || 0),
 };
@@ -180,6 +180,15 @@ function formatNum(num) {//数値の整形
     }
     //桁数と表示する文字を定義
     const units = [
+        { value: 10n ** 68n, symbol: '無量大数' },
+        { value: 10n ** 64n, symbol: '不可思議' },
+        { value: 10n ** 60n, symbol: '那由多' },
+        { value: 10n ** 56n, symbol: '阿僧祇' },
+        { value: 10n ** 52n, symbol: '恒河沙' },
+        { value: 10n ** 48n, symbol: '極' },
+        { value: 10n ** 44n, symbol: '載' },
+        { value: 10n ** 40n, symbol: '正' },
+        { value: 10n ** 36n, symbol: '澗' },
         { value: 10n ** 32n, symbol: '溝' },
         { value: 10n ** 28n, symbol: '穣' },
         { value: 10n ** 24n, symbol: '𥝱' },
