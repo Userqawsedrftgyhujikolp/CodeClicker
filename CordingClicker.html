@@ -12,6 +12,11 @@
     <h1>コードクリッカー</h1>
     <main>
         <hr>
+        <section>
+            <span class="refInfo"><span class="reftex">???</span> ＋ <span class="refval">0</span></span>
+            <span class="log" hidden> / 所持コミットログ:<span class="logval"></span></span> 
+            <input type="button" value="リファクタリング" class="refBtn" hidden>
+        </section>
         <section class="main">
             <div class="mainbar">
                 <div class="Mbar">
@@ -37,11 +42,18 @@
         </section>
         <hr>
         <section class="under">
+            <div class="refUpgrade" hidden>
+                <h2>リファクタリングアップグレード</h2>
+                <p>コミットログを知見として消費し、永続的な強化を得ます</p>
+                <div class="refUp"></div>
+                <hr>
+            </div>
             <div class="status">
                 
             </div>
         </section>
     </main>
+    
     <footer>
         <input type="button" value="進行を保存" class="save">
 
@@ -51,6 +63,8 @@
             <input type="button" value="クリック強化リセット" class="reset2">
             <input type="button" value="所持施設リセット" class="reset3">
             <input type="button" value="施設強化リセット" class="reset4">
+            <input type="button" value="コミットログリセット" class="reset5">
+            <input type="button" value="ﾘﾌｧｸﾀﾘﾝｸﾞｱｯﾌﾟｸﾞﾚｰﾄﾞリセット" class="reset6">
             <input type="button" value="完全リセット" class="resetAll"><br>
             <input type="button" value="所持金を$1万増やす" class="debugM1">
             <input type="button" value="所持金を$1億増やす" class="debugM2">
