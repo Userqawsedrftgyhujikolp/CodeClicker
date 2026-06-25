@@ -22,9 +22,17 @@ const Item_text = {//表示物兼Tier数定義
     T15: { name: `JavaScript`, text: `この世界を構築するソースコードから更にコードを生み出します\n『全てはここから始まった』` },
 }
 const Itemkeys = Object.keys(Item_text);
+const Ref_Upgrade = {
+    //リファクタリング後の強化内容
+    //name->名前 text->説明 req->前提の強化(存在しないならnull) cost->必要ポイント
+    S1: { name: `効率化の基本`, text: `Apsを1.5倍にします\n『身の丈に合ったコーディング』`, req: null, cost: 1n },
+    S2: { name: `黄金の指`, text: `クリックによる生産力がApsの1%増加します\n『0.01秒の効率化も1億回重なれば11.57日の短縮になる』`, req: `S1`, cost: 5n },
+}
+const Skillkeys = Object.keys(Ref_Upgrade);
 //ステータス
 const gameState = {
-    Money: BigInt(Math.floor(parseFloat(localStorage.getItem('Money'))) || 0n),
+    Money: BigInt(localStorage.getItem('Money') || 0n),
+    ComLog: BigInt(localStorage.getItem(`ComLog`) || 0n),
     ClRank: parseInt(localStorage.getItem(`ClRank`) || 0),
     ClPow: parseInt(localStorage.getItem('ClPow') || 0),
 };
@@ -32,7 +40,11 @@ for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     gameState[`T${i}Rank`] = parseInt(localStorage.getItem(`T${i}Rank`) || 0);
     gameState[`T${i}Pow`] = parseInt(localStorage.getItem(`T${i}Pow`) || 0);
 }
+for (let i = 1; i <= (Skillkeys.length); i++) {
+    gameState[`S${i}`] = parseInt(localStorage.getItem(`S${i}`) || 0);
+}
 //その他データ準備
+let refFlg = parseInt(localStorage.getItem("refFlg") || 0);
 let isDev = parseInt(localStorage.getItem("debugFlg") || 0);
 let lastTime = performance.now();
 let Aps = 0n;
@@ -40,9 +52,8 @@ let nextTier = parseInt(localStorage.getItem(`nextTier`) || 1);
 
 const Item_config = {//強化項目の数値
     //T20以上を追加する場合はRankとPowの両方を追加してください
-    //注意：数字が大きすぎるためT16以降の挙動は不具合が発生する場合があります
     //BaceCost->基本価格・multipul->価格の上昇倍率・Pow->1購入あたりの秒間生産量
-    ClRank: { BaceCost: 70000n, multipul: 26n, },
+    ClRank: { BaceCost: 70000n, multipul: 29n, },
     //前のTierの13倍の価格・15倍のパワー
     T1Rank: { BaceCost: 2000000n, multipul: 13n, Pow: 1n },
     T2Rank: { BaceCost: 26000000n, multipul: 13n, Pow: 15n },
@@ -76,7 +87,7 @@ const Item_config = {//強化項目の数値
     T8Pow: { BaceCost: 690233687000000n, multipul: 29n },
     T9Pow: { BaceCost: 8973037931000000n, multipul: 29n },
     T10Pow: { BaceCost: 116649493103000000n, multipul: 29n },
-    T11Pow: { BaceCost: 1516443410339000000n, multipul: 29n},
+    T11Pow: { BaceCost: 1516443410339000000n, multipul: 29n },
     T12Pow: { BaceCost: 19713764334407000000n, multipul: 29n },
     T13Pow: { BaceCost: 256278936347291000000n, multipul: 29n },
     T14Pow: { BaceCost: 3331626172514783000000n, multipul: 29n },
@@ -88,22 +99,32 @@ const Item_config = {//強化項目の数値
     T19Pow: { BaceCost: 1237009476471531324419000000n, multipul: 29n },
     T20Pow: { BaceCost: 16081123194129907217447000000n, multipul: 29n },
 }
-
+const Refactoring_config = {
+    base: 1000000000000n,
+    mul: 19n,
+    div: 10n,
+    pen: 11n
+}
 //数値更新時処理等
 const game = new Proxy(gameState, {
     set(target, prop, value) {
         target[prop] = value;
         if (prop === 'Money') {
             document.querySelector('.Money').textContent = formatNum(value);
+            document.querySelector('.refInfo').title = `現在の進捗${refProgress().percent}%\n次の必要量 $${formatNum(refProgress().need)}`;
             while (Item_config[`T${nextTier}Rank`]) {//所持金に応じたTierの解放
                 const targetConfig = Item_config[`T${nextTier}Rank`];
                 // そのTierの基本価格の30%のお金が溜まったら強化の表示解放
-                if (value >= ((targetConfig.BaceCost * 3n) / 10n)) {
+                if (value >= ((targetConfig.BaceCost * 4n) / 100n)) {
                     unlockTierDOM(nextTier);
                     nextTier++;
                 } else {
                     break;
                 }
+            }
+            if (refFlg || calcRefPoints() > 0n) {
+                document.querySelector('.refval').textContent = formatNum(calcRefPoints() * 1000n);
+                document.querySelector('.refBtn').removeAttribute('hidden');
             }
         }
         if (prop === 'ClRank') {
@@ -126,13 +147,24 @@ const game = new Proxy(gameState, {
             document.querySelector(`.${prop}`).value = `${tier}強化 (＄: ${formatNum(Cost)})`;
             Aps = calAps();
         }
+        if (prop === 'ComLog') {
+            document.querySelector('.refval').textContent = formatNum(calcRefPoints() * 1000n);
+            document.querySelector('.logval').textContent = formatNum(value * 1000n);
+        }
         return true;
     }
 });
 
 //処理
 function cordingClk() {//クリック時処理
-    game.Money += 1000n * (2n ** BigInt(game.ClRank));
+    let add = 1000n * (2n ** BigInt(game.ClRank));
+    if (game.S2) {
+        add += Aps * 10n;
+    }
+    game.Money += add;
+    if(isDev){
+        console.log(`クリックによる増加: ${add} (${formatNum(add)})`)
+    }
 }
 function gameLoop(currentTime) {//自動化
     //前回のフレームから何秒経過したかを計算
@@ -150,12 +182,18 @@ function calAps() {//Aps計算
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         num += Item_config[`T${i}Rank`].Pow * BigInt(game[`T${i}Rank`]) * (2n ** BigInt(game[`T${i}Pow`]));
     }
+    if (game.ComLog > 0n) {//Comlog * 1%増加
+        num += (num * game.ComLog) / 100n;
+    }
+    if (game.S1) {
+        num = ((num * 15n) / 10n);
+    }
     if (zeroApsFlg) {
         num = 0n;
     }
-    document.querySelector('.aps').textContent = formatNum(num*1000n);
-    if(isDev){
-        console.log('Aps: ',num)
+    document.querySelector('.aps').textContent = formatNum(num * 1000n);
+    if (isDev) {
+        console.log('Aps: ', num)
     }
     return num;
 }
@@ -165,21 +203,30 @@ function calCost(Key, Rank) {//強化コスト計算
     if (!item) { return -1n };
     let Cost = (item.BaceCost * (item.multipul ** Brank));
     Cost *= 11n ** (Brank / 5n);
-    const div = 10n * (10n ** Brank) * (10n ** (Brank/5n));
+    const div = 10n * (10n ** Brank) * (10n ** (Brank / 5n));
     Cost /= div;
     if (isDev) {
-        console.log('コスト: ', Key, ' = ', Cost,':(',formatNum(Cost),')');
+        console.log('コスト: ', Key, ' = ', Cost, ':(', formatNum(Cost), ')');
     }
     return Cost;
 }//calCost('T1Rank',game.T1Rank);
 function formatNum(num) {//数値の整形
     // 1万未満の場合はそのまま返す
-    num = num / 1000n;
+    num = BigInt(num) / 1000n;
     if (num < 10000n) {
         return num.toString();
     }
     //桁数と表示する文字を定義
     const units = [
+        { value: 10n ** 68n, symbol: '無量大数' },
+        { value: 10n ** 64n, symbol: '不可思議' },
+        { value: 10n ** 60n, symbol: '那由多' },
+        { value: 10n ** 56n, symbol: '阿僧祇' },
+        { value: 10n ** 52n, symbol: '恒河沙' },
+        { value: 10n ** 48n, symbol: '極' },
+        { value: 10n ** 44n, symbol: '載' },
+        { value: 10n ** 40n, symbol: '正' },
+        { value: 10n ** 36n, symbol: '澗' },
         { value: 10n ** 32n, symbol: '溝' },
         { value: 10n ** 28n, symbol: '穣' },
         { value: 10n ** 24n, symbol: '𥝱' },
@@ -192,9 +239,9 @@ function formatNum(num) {//数値の整形
     //上記オブジェクトの上から順に数値を比較し適切な桁を調べる
     for (let i = 0; i < units.length; i++) {
         if (num >= units[i].value) {
-            let numstr = (num / (units[i].value / 100n))+``;
-            return numstr.slice(0, -2)+'.'+numstr.slice(-2)+ units[i].symbol;
-            
+            let numstr = (num / (units[i].value / 100n)) + ``;
+            return numstr.slice(0, -2) + '.' + numstr.slice(-2) + units[i].symbol;
+
         }
     }
     return num.toString();
@@ -216,7 +263,7 @@ function unlockTierDOM(tier) {//非表示の解除
 //強化系
 function buyUpgrade(rank) {//自動化購入
     let Cost = calCost(rank, game[rank]);
-    if (Cost <= 0n) {return false;}
+    if (Cost <= 0n) { return false; }
     if (game.Money >= Cost) {
         game.Money -= Cost;
         game[rank]++;
@@ -226,16 +273,117 @@ function buyUpgrade(rank) {//自動化購入
         return true;
     }
 }
+function calcRefPoints() {//リファクタリング時の獲得ポイント計算
+    const baseMoney = 1000n * Refactoring_config.base; //1000 * リファクタリング基本価格
+    if (game.Money < baseMoney) {
+        return 0n;
+    }
+    let points = 0n;
+    let num = baseMoney;
+    let den = 1n;
+    while (game.Money >= num) {
+        points++;
+        num *= Refactoring_config.mul;//必要量の倍率
+        num /= Refactoring_config.div;
+        if ((points % 5n) == 0n) {
+            num *= Refactoring_config.pen;
+            num /= Refactoring_config.div;
+        }
+    }
+    return points;
+}
+function refProgress() {
+    const baseMoney = 1000n * Refactoring_config.base;
+    let need = 0n
+    let percent = 0;
+    if (baseMoney > game.Money) {
+        need = baseMoney - game.Money;
+        percent = Number(game.Money * 100n / baseMoney)
+        return {
+            need: need,
+            percent: percent,
+        }
+    }
+    let currentReq = baseMoney;
+    let nextReq = baseMoney * 21n / 10n;
+    while (game.Money >= nextReq) {
+        currentReq = nextReq;
+        nextReq = nextReq * 21n / 10n;
+    }
+    const totalStep = nextReq - currentReq;
+    const currentStep = game.Money - currentReq;
+    need = nextReq - game.Money;
+    
+    percent = Number(currentStep * 100n / totalStep);
+
+    return {
+        need: need,
+        percent: percent
+    }
+}
+function refactoring() {//リファクタリング
+    if (calcRefPoints() == 0n) {
+        alert("*必要金額に達していないためリファクタリングできません*\n必要金額に達した状態でリファクタリングをするとコミットログを得ます\nコミットログはApsに1%のボーナスを与え、消費することで特別な強化を得ることができます")
+        return;
+    }
+    if (confirm(`リファクタリングしますか？\n現在の強化がリセットされ${formatNum(calcRefPoints() * 1000n)}コミットログを得ます\nコミットログはApsに1%のボーナスを与え、消費することで特別な強化を得ることができます`)) {
+        refFlg = 1;
+        game.ComLog += calcRefPoints();
+        game.Money = 0n;
+        game.ClRank = 0;
+        game.ClPow = 0;
+        for (let i = 1; i <= (Itemkeys.length - 1); i++) {
+            game[`T${i}Rank`] = 0;
+            game[`T${i}Pow`] = 0;
+        }
+        Aps = calAps();
+        nextTier = 1;
+        if (isDev) {
+            console.log(`リファクタリングしました`);
+        }
+        document.querySelector('.log').removeAttribute('hidden');
+        document.querySelector('.reftex').textContent = "ログ";
+        document.querySelector('.refBtn').removeAttribute('hidden');
+        document.querySelector('.refUpgrade').removeAttribute('hidden');
+    }
+}
+function buyRefUpgrade(key) {//リファクタリング強化購入
+    const skill = Ref_Upgrade[key];
+    if (skill == null) {
+        return;
+    }
+    if (skill.req != null && game[skill.req] == 0) {
+        if (isDev) { console.log("前提となるスキルが解放されていません") };
+        return false
+    }
+    if (game[key]) {
+        if (isDev) { console.log("既に購入済みです") };
+        return false
+    }
+    if (game.ComLog >= skill.cost) {
+        game.ComLog -= skill.cost;
+        game[key] = 1;
+        document.querySelector(`.${key}`).disabled = true;
+        Aps = calAps();
+        if (isDev) { console.log(`${key}:購入しました/コスト:${skill.cost}`); }
+    }
+}
+
 //保存
 function saveGame() {//保存処理
     localStorage.setItem('Money', game.Money);
+    localStorage.setItem('ComLog', game.ComLog);
     localStorage.setItem('ClRank', game.ClRank);
     localStorage.setItem('ClPow', game.ClPow);
     for (let i = 1; i <= (Itemkeys.length - 1); i++) {
         localStorage.setItem(`T${i}Rank`, game[`T${i}Rank`]);
         localStorage.setItem(`T${i}Pow`, game[`T${i}Pow`]);
     }
+    for (let i = 1; i <= (Skillkeys.length); i++) {
+        localStorage.setItem(`S${i}`, game[`S${i}`]);
+    }
     localStorage.setItem('nextTier', nextTier);
+    localStorage.setItem('refFlg', refFlg);
     if (isDev) {
         console.log(`進行を保存しました`);
     }
@@ -288,8 +436,8 @@ function aReset() {//完全リセット処理
             }
             Aps = calAps();
             nextTier = 1;
-            saveGame();
             console.log(`進行を初期化しました/GameData has been reset.`);
+            localStorage.setItem(`debugFlg`, 1);
             location.reload();
         }
     }
@@ -308,6 +456,24 @@ function pReset() {//施設強化リセット
             game[`T${i}Pow`] = 0;
         }
         console.log(`施設強化を初期化しました/TierPow has been reset.`);
+    }
+}
+function comReset() {//コミットログリセット
+    if (isDev) {
+        game.ComLog = 0n;
+        console.log(`コミットログを初期化しました/CommitLog has been reset.`);
+    }
+}
+function refReset() {
+    if (isDev) {
+        for (let i = 1; i <= Skillkeys.length; i++) {
+            game[`S${i}`] = 0;
+        }
+        for (let i = 1; i <= (Skillkeys.length); i++) {
+            document.querySelector(`.S${i}`).disabled = false;
+        }
+        Aps = calAps();
+        console.log(`ﾘﾌｧｸﾀﾘﾝｸﾞｱｯﾌﾟｸﾞﾚｰﾄﾞを初期化しました/RefUpgrade has been reset.`);
     }
 }
 function addMoney(i) {//所持金増額
@@ -368,6 +534,22 @@ for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     `;
 }
 statusTable.innerHTML = statusdis;
+//リファクタリングアップグレード
+const refTable = document.querySelector('.refUp');
+let skillBtn = "";
+for (let i = 1; i <= (Skillkeys.length); i++) {
+    let key = Ref_Upgrade[`S${i}`];
+    skillBtn += `
+    <input type="button" class="S${i}" value="${key.name}" title="${key.text}">
+    `;
+}
+refTable.innerHTML = skillBtn;
+for (let i = 1; i <= (Skillkeys.length); i++) {
+    if (game[`S${i}`]) {
+        document.querySelector(`.S${i}`).disabled = true;
+    }
+}
+
 //各種数値の初期化
 game.Money = game.Money;
 game.ClRank = game.ClRank;
@@ -381,6 +563,13 @@ Aps = calAps();
 //起動時の非表示解除
 for (let i = 1; i < nextTier; i++) {
     unlockTierDOM(i);
+}
+if (refFlg) {
+    document.querySelector('.log').removeAttribute('hidden');
+    document.querySelector('.refBtn').removeAttribute('hidden');
+    document.querySelector('.refUpgrade').removeAttribute('hidden');
+    document.querySelector('.reftex').textContent = "ログ";
+    document.querySelector('.logval').textContent = `${formatNum(game.ComLog * 1000n)}`;
 }
 if (isDev) {
     document.querySelector('.debug').removeAttribute('hidden');
@@ -397,6 +586,11 @@ for (let i = 1; i <= (Itemkeys.length - 1); i++) {
     document.querySelector(`.AutoT${i}`).addEventListener(`click`, () => buyUpgrade(`T${i}Rank`));//自動化個数
     document.querySelector(`.T${i}Pow`).addEventListener(`click`, () => buyUpgrade(`T${i}Pow`));//自動化強化
 }
+//リファクタリング系
+document.querySelector('.refBtn').addEventListener(`click`, refactoring);
+for (let i = 1; i <= Skillkeys.length; i++) {
+    document.querySelector(`.S${i}`).addEventListener(`click`, () => buyRefUpgrade(`S${i}`));
+}
 //その他
 document.querySelector('.save').addEventListener(`click`, saveGame);
 document.querySelector('#debugFlg').addEventListener(`change`, debugFlg);
@@ -404,6 +598,8 @@ document.querySelector('.reset1').addEventListener(`click`, mReset);
 document.querySelector('.reset2').addEventListener(`click`, cReset);
 document.querySelector('.reset3').addEventListener(`click`, tReset);
 document.querySelector('.reset4').addEventListener(`click`, pReset);
+document.querySelector('.reset5').addEventListener(`click`, comReset);
+document.querySelector('.reset6').addEventListener(`click`, refReset);
 document.querySelector('.resetAll').addEventListener(`click`, aReset);
 document.querySelector('.debugM1').addEventListener(`click`, () => addMoney(4));
 document.querySelector('.debugM2').addEventListener(`click`, () => addMoney(8));
